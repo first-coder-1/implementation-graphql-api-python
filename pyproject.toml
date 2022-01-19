@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "movierental"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.71.0"
+strawberry-graphql = {extras = ["fastapi"], version = "^0.93.23"}
+uvicorn = {version = "0.15.0", extras = ["standard"]}
+SQLAlchemy = "^1.4.29"
+alembic = "^1.7.5"
+databases = "^0.5.3"
+asyncpg = "^0.25.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+pynvim = "^0.4.3"
+flake8 = "^4.0.1"
+pylint = "^2.12.2"
+mypy = "^0.930"
+jedi = "^0.18.1"
+black = "^21.12b0"
+sqlacodegen = "^2.3.0"
+psycopg2-binary = "^2.9.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

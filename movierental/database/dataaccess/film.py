@@ -22,8 +22,8 @@ async def get_film(film_ids=None, release_years=None, limit=10):
     return query
 
 
-async def get_actors_for_a_film(film_id):
-    query = session.select(FilmActor).filter(FilmActor.film_id == film_id)
+def get_actors_for_a_film(film_id):
+    query = session.query(FilmActor).filter(FilmActor.film_id == film_id)
 
     actor_ids = []
     for actor in query:

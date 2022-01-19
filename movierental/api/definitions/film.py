@@ -1,8 +1,6 @@
 import strawberry
 from typing import List, Optional
 
-from movierental.database.models import Film as FilmModel
-
 
 @strawberry.type(description="A film and it's attributes")
 class Film:
@@ -17,6 +15,16 @@ class Film:
     length: int
     replacement_cost: float
     mpaa_rating: str
+
+    import movierental.api.definitions.actor as actordf
+
+    @strawberry.field(description="Actors in the film")
+    def actor(self) -> Optional[List[actordf.Actor]]:
+        import movierental.database.dataaccess.film as FilmDA
+        import movierental.database.dataaccess.actor as ActorDA
+
+        actor_ids = FilmDA.get_actors_for_a_film(self.film_id)
+        return ActorDA.get_actor(actor_ids)
 
     @classmethod
     def from_instance(cls, instance):

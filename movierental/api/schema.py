@@ -9,7 +9,7 @@ from movierental.database.dataaccess import address as AddressDA
 from movierental.database.dataaccess import customer as CustomerDA
 from movierental.api.definitions.film import Film
 from movierental.api.definitions.actor import Actor
-from movierental.api.definitions.address import Address
+from movierental.api.definitions.address import Address, City
 from movierental.api.definitions.customer import Customer
 from movierental.database.models import Actor as ActorModel
 
@@ -18,31 +18,47 @@ from movierental.database.models import Actor as ActorModel
 class Query:
     @strawberry.field(description="Get details of a film")
     async def film(
-        self, film_ids: Optional[List[int]] = None, limit: int = 10
+        self,
+        film_ids: Optional[List[int]] = None,
+        release_years: Optional[List[int]] = None,
+        limit: int = 10,
     ) -> List[Film]:
-        films = await FilmDA.get_film(film_ids=film_ids, limit=limit)
+        films = await FilmDA.get_film(
+            film_ids=film_ids, release_years=release_years, limit=limit
+        )
         films = [Film.from_instance(a_film) for a_film in films]
 
         return films
 
     @strawberry.field(description="Get details of an actor")
     async def actor(
-        self, actor_ids: Optional[List[int]] = None, limit: int = 10
+        self,
+        actor_ids: Optional[List[int]] = None,
+        limit: int = 10,
     ) -> List[Actor]:
         actors = ActorDA.get_actor(actor_ids=actor_ids, limit=limit)
 
         actors = [Actor.from_instance(an_actor) for an_actor in actors]
 
-        for actor in actors:
-            film_ids = ActorDA.get_films_for_actor(actor.actor_id)
-            actor.film = FilmDA.get_film(film_ids)
-
         return actors
 
     @strawberry.field(description="Get details of address")
-    async def address(self, limit: int = 10) -> List[Address]:
-        addresses = AddressDA.get_address(limit=limit)
+    async def address(
+        self,
+        address_ids: Optional[List[int]] = None,
+        districts: Optional[List[str]] = None,
+        limit: int = 10,
+    ) -> List[Address]:
+        addresses = AddressDA.get_address(
+            address_ids=address_ids, districts=districts, limit=limit
+        )
         return [Address.from_instance(an_address) for an_address in addresses]
+
+    @strawberry.field(description="Get details of city")
+    async def city(self, limit: int = 10) -> List[City]:
+        cities = AddressDA.get_city(limit)
+
+        return [City.from_instance(city) for city in cities]
 
     @strawberry.field(description="Get details of customer")
     async def customer(

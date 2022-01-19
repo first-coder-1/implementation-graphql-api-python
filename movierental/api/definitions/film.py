@@ -25,11 +25,11 @@ class Film:
             title=instance.title,
             description=instance.description,
             release_year=instance.release_year,
-            language=instance.language.language,
+            language=instance.language.name,
             original_language=instance.original_language,
             rental_duration=instance.rental_duration,
             rental_rate=instance.rental_rate,
             length=instance.length,
             replacement_cost=instance.replacement_cost,
-            mpaa_rating=instance.mpaa_rating,
+            mpaa_rating=instance.rating,
         )

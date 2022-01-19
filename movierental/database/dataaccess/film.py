@@ -8,11 +8,14 @@ from movierental.database.models import Film, FilmActor, Actor
 from .db import db, session
 
 
-async def get_film(film_ids=None, limit=10):
+async def get_film(film_ids=None, release_years=None, limit=10):
     query = session.query(Film).options(joinedload(Film.language))
 
     if film_ids:
         query = query.filter(Film.film_id.in_(film_ids))
+
+    if release_years:
+        query = query.filter(Film.release_year.in_(release_years))
 
     query = query.limit(limit)
 

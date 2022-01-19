@@ -20,12 +20,26 @@ async def get_address_s(limit=None):
     return address
 
 
-def get_address(limit=None):
+def get_address(address_ids=None, districts=None, limit=None):
     query = (
         session.query(Addres)
         .options(joinedload(Addres.city).joinedload(City.country))
         .limit(limit)
     )
+
+    if address_ids:
+        query = query.filter(Addres.address_id.in_(address_ids))
+
+    if districts:
+        query = query.filter(Addres.district.in_(districts))
+
+    query = query.limit(limit)
+
+    return query
+
+
+def get_city(limit=None):
+    query = session.query(City).options(joinedload(City.country)).limit(limit)
 
     return query
 

@@ -2,6 +2,9 @@
 from typing import List
 from typing import Optional
 import strawberry
+from strawberry.types import Info
+from strawberry.dataloader import DataLoader
+from strawberry.extensions import Extension
 
 from movierental.database.dataaccess import film as FilmDA
 from movierental.database.dataaccess import actor as ActorDA
@@ -12,6 +15,10 @@ from movierental.api.definitions.actor import Actor
 from movierental.api.definitions.address import Address, City
 from movierental.api.definitions.customer import Customer
 from movierental.database.models import Actor as ActorModel
+import movierental.database.dataloader as dataloader
+
+
+# actor_loader = DataLoader(load_fn=ActorDA.get_actor)
 
 
 @strawberry.type
@@ -19,12 +26,11 @@ class Query:
     @strawberry.field(description="Get details of a film")
     async def film(
         self,
+        info: Info,
         film_ids: Optional[List[int]] = None,
-        release_years: Optional[List[int]] = None,
-        limit: int = 10,
     ) -> List[Film]:
-        films = await FilmDA.get_film(
-            film_ids=film_ids, release_years=release_years, limit=limit
+        films = await info.context[dataloader.DataLoaders.load_films].load_many(
+            film_ids
         )
         films = [Film.from_instance(a_film) for a_film in films]
 
@@ -33,10 +39,12 @@ class Query:
     @strawberry.field(description="Get details of an actor")
     async def actor(
         self,
+        info: Info,
         actor_ids: Optional[List[int]] = None,
-        limit: int = 10,
     ) -> List[Actor]:
-        actors = ActorDA.get_actor(actor_ids=actor_ids, limit=limit)
+        actors = await info.context[dataloader.DataLoaders.load_actor].load_many(
+            actor_ids
+        )
 
         actors = [Actor.from_instance(an_actor) for an_actor in actors]
 
@@ -75,4 +83,6 @@ class Mutation:
         return ActorDA.add_new_actor(first_name=first_name, last_name=last_name)
 
 
-schema = strawberry.Schema(query=Query, mutation=Mutation)
+schema = strawberry.Schema(
+    query=Query, mutation=Mutation, extensions=(dataloader.DataLoadersExtension,)
+)

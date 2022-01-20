@@ -7,6 +7,9 @@ from sqlalchemy.orm import joinedload
 from movierental.database.models import Film, FilmActor, Actor
 from .db import db, session
 
+from strawberry.dataloader import DataLoader
+from strawberry.extensions import Extension
+
 
 async def get_actor_s(limit=None):
     await db.connect()
@@ -27,7 +30,7 @@ async def get_actor_s(limit=None):
     return actors
 
 
-def get_actor(actor_ids=None, limit=None):
+async def get_actor(actor_ids=None, limit=None):
     query = session.query(Actor)
 
     if actor_ids:
@@ -35,6 +38,7 @@ def get_actor(actor_ids=None, limit=None):
 
     query = query.limit(limit)
 
+    print(f"******************************Database called here, {actor_ids}")
     return query
 
 
@@ -57,6 +61,11 @@ def add_new_actor(first_name: str, last_name: str) -> Actor:
     session.commit()
 
     return actor
+
+
+class DataLoaderExtension(Extension):
+    def on_request_start(self):
+        self.execution_context.context["actor_loader"] = DataLoader(get_actor)
 
 
 if __name__ == "__main__":

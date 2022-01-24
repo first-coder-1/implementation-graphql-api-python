@@ -13,10 +13,9 @@ class DataLoaders(enum.Enum):
 
 class DataLoadersExtension(Extension):
     def on_request_start(self):
-        print("^^^^^^^^^^^^^^^^^^^^This was run^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
         self.execution_context.context.update(
             {
-                DataLoaders.load_actor: DataLoader(dataaccess.actor.get_actor),
-                DataLoaders.load_films: DataLoader(dataaccess.film.get_film),
+                DataLoaders.load_actor: DataLoader(dataaccess.actor.get_actor_by_id),
+                DataLoaders.load_films: DataLoader(dataaccess.film.get_film_by_id),
             }
         )

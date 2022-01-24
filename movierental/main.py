@@ -1,4 +1,4 @@
-"""Just a module level comment"""
+""" Module for initializing FastAPI app object """
 
 
 from fastapi import FastAPI

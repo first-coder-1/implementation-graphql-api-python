@@ -1,6 +1,6 @@
 import strawberry
 
-import movierental.api.definitions.film as film
+import movierental.api.definition.film as film
 from movierental.database.models import City as CityModel
 from movierental.database.models import Addres as AddressModel
 from movierental.database.models import Country as CountryModel

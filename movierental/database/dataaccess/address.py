@@ -1,10 +1,13 @@
 """ Methods for fetching film related data from database """
 
 import asyncio
+
 import sqlalchemy
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
+
 from movierental.database.models import Addres, City, Country
+
 from .db import db, session
 
 

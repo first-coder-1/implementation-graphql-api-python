@@ -1,11 +1,7 @@
 import strawberry
 
-import movierental.api.definitions.film as film
-from movierental.database.models import City as CityModel
-from movierental.database.models import Addres as AddressModel
-from movierental.database.models import Country as CountryModel
+from movierental.api.definition.address import Address
 from movierental.database.models import Customer as CustomerModel
-from movierental.api.definitions.address import Address
 
 
 @strawberry.type(description="Customer and it's properties")

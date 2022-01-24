@@ -1,44 +1,32 @@
 """ Methods for fetching film related data from database """
 
 import asyncio
+
 import sqlalchemy
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
-from movierental.database.models import Film, FilmActor, Actor
-from .db import db, session
-
 from strawberry.dataloader import DataLoader
 from strawberry.extensions import Extension
 
+from movierental.database.models import Actor, Film, FilmActor
 
-async def get_actor_s(limit=None):
-    await db.connect()
-    query = (
-        select(Actor, FilmActor, Film)
-        .filter(Actor.actor_id == FilmActor.actor_id)
-        .filter(FilmActor.film_id == Film.film_id)
-        .limit(limit)
-    )
-    actors = await db.fetch_all(query)
-
-    print(len(actors))
-
-    for actor in actors:
-        for val in actor.items():
-            print(val)
-
-    return actors
+from .db import db, session
 
 
-async def get_actor(actor_ids=None, limit=None):
+async def get_actors(limit=10):
+    query = session.query(Actor)
+
+    query = query.limit(limit)
+
+    return query
+
+
+async def get_actor_by_id(actor_ids=None):
     query = session.query(Actor)
 
     if actor_ids:
         query = query.filter(Actor.actor_id.in_(actor_ids))
 
-    query = query.limit(limit)
-
-    print(f"******************************Database called here, {actor_ids}")
     return query
 
 
@@ -63,11 +51,6 @@ def add_new_actor(first_name: str, last_name: str) -> Actor:
     return actor
 
 
-class DataLoaderExtension(Extension):
-    def on_request_start(self):
-        self.execution_context.context["actor_loader"] = DataLoader(get_actor)
-
-
 if __name__ == "__main__":
-    get_actor(5)
+    get_actors(5)
     # asyncio.run(get_actor(5))

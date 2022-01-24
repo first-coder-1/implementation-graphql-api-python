@@ -1,18 +1,27 @@
 """ Methods for fetching film related data from database """
 
 import asyncio
+
 import sqlalchemy
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
-from movierental.database.models import Film, FilmActor, Actor
+
+from movierental.database.models import Actor, Film, FilmActor
+
 from .db import db, session
 
 
-async def get_film(film_ids=None, release_years=None, limit=10):
+async def get_film_by_id(film_ids):
     query = session.query(Film).options(joinedload(Film.language))
 
     if film_ids:
         query = query.filter(Film.film_id.in_(film_ids))
+
+    return query
+
+
+async def get_films(release_years=None, limit=10):
+    query = session.query(Film).options(joinedload(Film.language))
 
     if release_years:
         query = query.filter(Film.release_year.in_(release_years))
@@ -33,4 +42,4 @@ def get_actors_for_a_film(film_id):
 
 
 if __name__ == "__main__":
-    asyncio.run(get_film())
+    asyncio.run(get_films())

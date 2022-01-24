@@ -1,11 +1,13 @@
 from __future__ import annotations
-import strawberry
 import typing
-from typing import Optional, List
+from typing import List, Optional
 
+import strawberry
+from strawberry.types import Info
 
-import movierental.database.dataaccess.film as FilmDA
 import movierental.database.dataaccess.actor as ActorDA
+import movierental.database.dataaccess.film as FilmDA
+from movierental.database.dataloader import DataLoaders
 
 
 @strawberry.type(description="An actor and it's attributes")
@@ -16,22 +18,16 @@ class Actor:
 
     @strawberry.field(description="films for the actor")
     async def film(
-        self,
-    ) -> Optional[
-        List[strawberry.LazyType["Film", "movierental.api.definitions.film"]]
-    ]:
-        from movierental.api.definitions.film import Film
+        self, info: Info
+    ) -> Optional[List[strawberry.LazyType["Film", "movierental.api.definition.film"]]]:
+        from movierental.api.definition.film import Film
 
         film_ids = ActorDA.get_films_for_actor(self.actor_id)
-        return [
-            Film.from_instance(a_film)
-            for a_film in await FilmDA.get_film(film_ids=film_ids)
-        ]
+        films = await info.context[DataLoaders.load_films].load_many(film_ids)
+        return [Film.from_instance(a_film) for a_film in films]
 
     @classmethod
     def from_instance(cls, instance):
-        print(instance)
-        print(type(instance))
         return cls(
             actor_id=instance.actor_id,
             first_name=instance.first_name,
